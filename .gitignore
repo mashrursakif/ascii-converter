@@ -1,4 +1,4 @@
-/build/
+build/
 /obj/
-*.0
+*.o
 *.exe
