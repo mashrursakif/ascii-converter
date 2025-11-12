@@ -14,46 +14,70 @@ void print_output(FILE *output, unsigned char *img, int output_width,
 const char *ascii = "@#*+=-:. ";
 // const char *ascii = "$@B8&WM#*/()1{}[]?-_+~<>i!lI;:,^. ";
 
-int main() {
+int main(int argc, char *argv[]) {
+  char *image_path = NULL;
+  char *output_file_path = NULL;
+  int output_size = 80;
 
-  char image_path[256] = "samples/test_image.jpg";
-  printf("Enter path to image:");
-  scanf("%s", image_path);
+  for (int i = 0; i < argc; ++i) {
+
+    // INPUT IMAGE PATH
+    if (strcmp(argv[i], "-i") == 0 && (i + 1) < argc) {
+      image_path = argv[i + 1];
+    }
+
+    // OUTPUT FILE PATH
+    if (strcmp(argv[i], "-o") == 0 && (i + 1) < argc) {
+      output_file_path = argv[i + 1];
+    }
+
+    // RESOLUTION
+    if (strcmp(argv[i], "-r") == 0 && (i + 1) < argc) {
+      output_size = atoi(argv[i + 1]);
+    }
+  }
+
+  // Set default image path if nothing is provided
+  if (!image_path) {
+    fprintf(stderr, "Error: image path not defined");
+    exit(EXIT_FAILURE);
+  }
+
+  // Set default output file, use stdout if none provided
+  FILE *output_file = NULL;
+  if (output_file_path) {
+    output_file = fopen("output.txt", "w");
+  } else {
+    output_file = stdout;
+  }
+
+  // Validating output_size
+  if (!output_size || output_size <= 0) {
+    fprintf(stderr, "Error: Invalid output resolution\n");
+    exit(EXIT_FAILURE);
+  }
 
   int width, height, channels;
   unsigned char *original_img =
       stbi_load(image_path, &width, &height, &channels, 1);
 
   if (!original_img) {
-    printf("Error: failed to load image. %s\n", stbi_failure_reason());
+    fprintf(stderr, "Error: failed to load image. %s\n", stbi_failure_reason());
     exit(EXIT_FAILURE);
   }
 
-  int output_size = 80;
   int output_width = output_size;
-  int output_height = output_size * 0.5;
+  int output_height = output_size * 0.3;
   int output_channels = 1;
   size_t buffer_size = output_width * output_height * output_channels;
   unsigned char *scaled_img = malloc(buffer_size);
 
-  printf("allocated %zu bytes\n", buffer_size);
-
   stbir_resize_uint8_linear(original_img, width, height, 0, scaled_img,
                             output_width, output_height, 0, output_channels);
 
-  // if (save_to_file) {
-  //   FILE *output_file = fopen("output.txt", "w");
-  //   if (!output_file) {
-  //     perror("Output file cannot be opened");
-  //   }
-
-  // } else {
-  //   FILE *output_file = stdout;
-  // }
-
-  FILE *output_file = stdout;
-
   print_output(output_file, scaled_img, output_width, output_height);
+
+  printf("\nOutput complete!\n");
 
   stbi_image_free(original_img);
   stbi_image_free(scaled_img);
