@@ -1,6 +1,6 @@
 # ASCII Image Converter
 
-A C program for converting images to ASCII art
+A C program for converting images to ASCII text
 
 ## Functionality
 
@@ -14,13 +14,13 @@ A C program for converting images to ASCII art
 1. Clone the repository
 
 ```
-git clone
+git clone https://github.com/mashrursakif/ascii-converter.git
 ```
 
 2. Compile
 
 ```
-gcc src/main.c -o ascii_converter -lm
+cd ascii-converter; gcc src/main.c -o ascii_converter -lm
 ```
 
 3. Run
@@ -29,8 +29,8 @@ gcc src/main.c -o ascii_converter -lm
 ./ascii_converter -i 'images/cat.jpg' -o 'output.txt' -r 100
 ```
 
-### Flags:
+### Command Line Flags:
 
--i: Specify path for input image (required)
--o: Specify path for output image (optional, defaults to outputting directly in terminal)
--r: horizontal resolution (optional, default: 80)
+- -i: Specify path for input image (required)
+- -o: Specify path for output image (optional, defaults to outputting directly in terminal)
+- -r: horizontal resolution (optional, default: 80)
