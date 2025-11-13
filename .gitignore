@@ -3,3 +3,4 @@ build/
 *.o
 *.exe
 samples/
+ascii_converter
