@@ -1,14 +1,10 @@
 #include "../include/image_process.h"
-#include <stdio.h>
-#include <string.h>
+#include "../include/utils.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "../include/stb_image.h"
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include "../include/stb_image_resize2.h"
-
-const char *ascii = "@#*+=-:. ";
-// const char *ascii = "$@B8&WM#*/()1{}[]?-_+~<>i!lI;:,^. ";
 
 void print_image_from_file(char *image_path, FILE *output_file,
                            int output_size) {
@@ -36,24 +32,4 @@ void print_image_from_file(char *image_path, FILE *output_file,
 
   stbi_image_free(original_img);
   stbi_image_free(scaled_img);
-}
-
-char map_px_to_char(unsigned char brightness) {
-  int ascii_len = strlen(ascii);
-
-  int idx = (brightness / 256.0) * ascii_len;
-  return ascii[idx];
-}
-
-void print_output(FILE *output_file, unsigned char *img, int output_width,
-                  int output_height) {
-  for (int y = 0; y < output_height; ++y) {
-    for (int x = 0; x < output_width; ++x) {
-      unsigned char brightness = img[y * output_width + x];
-      // printf("%c", map_px_to_char(brightness));
-      fputc(map_px_to_char(brightness), output_file);
-    }
-    // printf("\n");
-    fputc('\n', output_file);
-  }
 }

@@ -4,3 +4,5 @@ build/
 *.exe
 samples/
 ascii_converter
+output.txt
+outputs/

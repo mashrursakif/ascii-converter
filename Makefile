@@ -1,17 +1,20 @@
 CC = gcc
 CFLAGS = -Iinclude -Wall -O2
 
-SRC = src/main.c src/image_process.c
-OBJ = $(SRC:.c=.o)
-TARGET = ascii_converter
+LDFLAGS = -lavformat -lavcodec -lavutil -lswscale -lm
+
+SRC = $(wildcard src/*.c)
+OBJ = $(patsubst src/%.c, build/%.o, $(SRC))
+TARGET = build/ascii_converter
 
 all: $(TARGET)
 
-$(TARGET): $(OBJ)
-	$(CC) $(OBJ) -o $(TARGET) -lm
-
-%.o: %.c
+build/%.o: src/%.c
+	mkdir -p build
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(TARGET): $(OBJ)
+	$(CC) $(OBJ) -o $(TARGET) $(LDFLAGS)
+
 clean:
-	rm -f $(OBJ) $(TARGET)
+	rm -rf build
