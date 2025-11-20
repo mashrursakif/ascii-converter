@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Iinclude -Wall -O2
+CFLAGS = -Iinclude -Wall -Wextra -Werror -O2
 
 LDFLAGS = -lavformat -lavcodec -lavutil -lswscale -lm
 
@@ -14,7 +14,7 @@ build/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(TARGET): $(OBJ)
-	$(CC) $(OBJ) -o $(TARGET) $(LDFLAGS)
+	$(CC) -fsanitize=address $(OBJ) -o $(TARGET) $(LDFLAGS)
 
 clean:
 	rm -rf build

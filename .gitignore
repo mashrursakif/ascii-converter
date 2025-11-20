@@ -5,4 +5,4 @@ build/
 samples/
 ascii_converter
 output.txt
-outputs/
+outputs/*

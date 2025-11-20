@@ -13,22 +13,25 @@
 
 int is_image_file(const char *filename);
 int is_video_file(const char *filename);
+char *get_output_path(const char *path);
 
 int main(int argc, char *argv[]) {
-  char *input_file = NULL;
-  char *output_file_path = NULL;
+  char *input_path = NULL;
+  // char *output_file_path = NULL;
+  int save_output = 0;
   int output_size = 80;
 
   for (int i = 0; i < argc; ++i) {
 
     // INPUT IMAGE PATH
     if (strcmp(argv[i], "-i") == 0 && (i + 1) < argc) {
-      input_file = argv[i + 1];
+      input_path = argv[i + 1];
     }
 
     // OUTPUT FILE PATH
-    if (strcmp(argv[i], "-o") == 0 && (i + 1) < argc) {
-      output_file_path = argv[i + 1];
+    if (strcmp(argv[i], "-s") == 0) {
+      // output_file_path = argv[i + 1];
+      save_output = 1;
     }
 
     // RESOLUTION
@@ -38,15 +41,32 @@ int main(int argc, char *argv[]) {
   }
 
   // Set default image path if nothing is provided
-  if (!input_file) {
+  if (!input_path) {
     fprintf(stderr, "Error: input path not defined");
     exit(EXIT_FAILURE);
   }
 
   // Set default output file, use stdout if none provided
   FILE *output_file = NULL;
-  if (output_file_path) {
-    output_file = fopen(output_file_path, "w");
+  if (save_output) {
+    char *input_path_copy = malloc(strlen(input_path) + 1);
+    if (!input_path_copy) {
+      fprintf(stderr, "Error: Failed to allocate memory for input path");
+      exit(EXIT_FAILURE);
+    }
+
+    strcpy(input_path_copy, input_path);
+
+    char *output_path = get_output_path(input_path_copy);
+
+    if (!output_path) {
+      fprintf(stderr, "Error: invalid output path");
+      exit(EXIT_FAILURE);
+    }
+    output_file = fopen(output_path, "w");
+
+    free(input_path_copy);
+    free(output_path);
   } else {
     output_file = stdout;
   }
@@ -57,16 +77,42 @@ int main(int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  if (is_image_file(input_file)) {
-    print_image_from_file(input_file, output_file, output_size);
-  } else if (is_video_file(input_file)) {
-    print_video_from_file(input_file, output_file, output_size);
+  if (is_image_file(input_path)) {
+    print_image_from_file(input_path, output_file, output_size);
+  } else if (is_video_file(input_path)) {
+    print_video_from_file(input_path, output_file, output_size);
   } else {
     fprintf(stderr, "Error: file format not supported\n");
     exit(EXIT_FAILURE);
   }
 
   return 0;
+}
+
+char *get_output_path(const char *path) {
+  const char *base = path;
+  const char *slash1 = strrchr(path, '/');
+  const char *slash2 = strrchr(path, '\\');
+
+  if (slash1 && slash1 > base)
+    base = slash1 + 1;
+  if (slash2 && slash2 > base)
+    base = slash2 + 1;
+
+  char *dot = strrchr(base, '.');
+  if (dot) {
+    *dot = '\0';
+  }
+
+  char *output_dir = "outputs/";
+  char *ext = ".txt";
+  char *result = malloc(strlen(output_dir) + strlen(base) + strlen(ext) + 1);
+  if (!result)
+    return NULL;
+
+  sprintf(result, "%s%s%s", output_dir, base, ext);
+
+  return result;
 }
 
 int is_image_file(const char *filename) {

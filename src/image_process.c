@@ -8,6 +8,7 @@
 
 void print_image_from_file(char *image_path, FILE *output_file,
                            int output_size) {
+
   int width, height, channels;
   unsigned char *original_img =
       stbi_load(image_path, &width, &height, &channels, 1);

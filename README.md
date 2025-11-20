@@ -20,17 +20,17 @@ git clone https://github.com/mashrursakif/ascii-converter.git
 2. Compile
 
 ```
-cd ascii-converter; gcc src/main.c -o ascii_converter -lm
+cd ascii-converter; make
 ```
 
 3. Run
 
 ```
-./ascii_converter -i 'images/cat.jpg' -o 'output.txt' -r 100
+./ascii_converter -i 'images/cat.jpg' -s -r 100
 ```
 
 ### Command Line Flags:
 
 - -i: Specify path for input image (required)
-- -o: Specify path for output image (optional, defaults to outputting directly in terminal)
+- -s: Save output image (optional, saves as txt file in the outputs/ directory)
 - -r: horizontal resolution (optional, default: 80)
