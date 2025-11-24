@@ -6,8 +6,8 @@
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include "../include/stb_image_resize2.h"
 
-void print_image_from_file(char *image_path, FILE *output_file,
-                           int output_size) {
+void print_image_from_input(char *image_path, FILE *output_file,
+                            int output_size) {
 
   int width, height, channels;
   unsigned char *original_img =
@@ -29,8 +29,10 @@ void print_image_from_file(char *image_path, FILE *output_file,
 
   print_output(output_file, scaled_img, output_width, output_height);
 
-  printf("\nOutput complete!\n");
+  // printf("\nOutput complete!\n");
 
   stbi_image_free(original_img);
   stbi_image_free(scaled_img);
 }
+
+void display_image(char *buffer) { printf("%s", buffer); }

@@ -13,12 +13,16 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "../include/utils.h"
 
-void print_video_from_file(const char *input_path, FILE *output_file,
-                           int output_size) {
+const int fps = 24;
+const long frame_time = 1000000 / fps;
+
+void print_video_from_input(const char *input_path, FILE *output_file,
+                            int output_size) {
   AVFormatContext *format_context = NULL;
 
   if (avformat_open_input(&format_context, input_path, NULL, NULL) < 0) {
@@ -68,10 +72,8 @@ void print_video_from_file(const char *input_path, FILE *output_file,
   av_image_fill_arrays(scaled_frame->data, scaled_frame->linesize, buffer,
                        AV_PIX_FMT_GRAY8, output_width, output_height, 1);
 
-  printf("\033[2J");
-
-  int fps = 24;
-  long frame_time = 1000000 / fps;
+  if (output_file == stdout)
+    printf("\033[2J");
 
   while (av_read_frame(format_context, packet) >= 0) {
     if (packet->stream_index == video_stream_idx) {
@@ -81,11 +83,16 @@ void print_video_from_file(const char *input_path, FILE *output_file,
                     original_frame->linesize, 0, original_frame->height,
                     scaled_frame->data, scaled_frame->linesize);
 
-          print_output(stdout, scaled_frame->data[0], output_width,
+          print_output(output_file, scaled_frame->data[0], output_width,
                        output_height);
-          printf("\033[H");
-          usleep(frame_time);
-          fflush(stdout);
+
+          if (output_file == stdout) {
+            printf("\033[H");
+            usleep(frame_time);
+            fflush(stdout);
+          } else {
+            fprintf(output_file, "%s", "<FRAME>\n");
+          }
         }
       }
     }
@@ -99,4 +106,20 @@ void print_video_from_file(const char *input_path, FILE *output_file,
   avcodec_free_context(&codec_context);
   avformat_close_input(&format_context);
   sws_freeContext(sws_context);
+}
+
+void display_video(char *buffer) {
+  printf("\033[2J");
+
+  char *p = buffer;
+  while ((p = strstr(p, "<FRAME>")) != NULL) {
+    *p = '\0';
+    printf("%s", buffer);
+    buffer = p + strlen("<FRAME>");
+    p = buffer;
+
+    printf("\033[H");
+    usleep(frame_time);
+    fflush(stdout);
+  }
 }
