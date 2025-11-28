@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>ASCII Converter</title>
+		<!-- <link rel="stylesheet" href="styles.css" /> -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&family=Press+Start+2P&display=swap"
+			rel="stylesheet"
+		/>
+
+		<link rel="icon" type="image/x-icon" href="favicon.ico" />
+	</head>
+
+	<body>
+		<div class="con">
+			<h1 id="main-head">ASCII Viewer</h1>
+
+			<p class="desc">Select a text file to view</p>
+
+			<div class="input-con">
+				<input type="file" id="file-input" accept=".txt,text/plain" />
+				<label for="file-input" id="file-input-label" class="hover"
+					>Choose File</label
+				>
+
+				<p class="file-err"></p>
+			</div>
+		</div>
+
+		<div id="viewer-con">
+			<div class="button-con">
+				<p>'Esc' to close</p>
+				<p>'T' to toggle dark/light mode</p>
+			</div>
+
+			<div id="ascii-con">
+				<pre id="ascii-text"></pre>
+			</div>
+		</div>
+	</body>
+
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			color: #fff;
+
+			/* font-family: Arial, Helvetica, sans-serif; */
+			font-family: 'Pixelify Sans', sans-serif;
+			font-optical-sizing: auto;
+			font-weight: 400;
+			font-style: normal;
+		}
+
+		h1,
+		h2,
+		h3,
+		p,
+		b {
+			margin: 0;
+		}
+
+		.con {
+			width: 100vw;
+			height: 100vh;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			flex-direction: column;
+
+			background: #000;
+		}
+
+		#main-head {
+			font-size: 48px;
+			font-weight: lighter;
+			margin: 0;
+		}
+
+		.desc {
+			margin: 0;
+			margin-top: 40px;
+			font-size: 24px;
+		}
+
+		.input-con {
+			/* padding: 20px; */
+			margin-top: 48px;
+		}
+
+		#file-input {
+			display: none;
+		}
+
+		#file-input-label {
+			border: 1px solid #fff;
+			padding: 16px 20px;
+			font-size: 20px;
+		}
+		.file-err {
+			display: none;
+			color: #ff5353;
+			margin-top: 32px;
+			font-size: 20px;
+		}
+
+		#viewer-con {
+			display: none;
+
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100vw;
+			height: 100vh;
+			/* display: flex; */
+			align-items: center;
+			justify-content: center;
+
+			flex-direction: column;
+
+			background: #ffffff50;
+			background: #000;
+		}
+
+		#ascii-con {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		#ascii-text {
+			margin: 0;
+			width: fit-content;
+		}
+
+		.button-con {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 20px;
+		}
+
+		.button {
+			background: transparent;
+			font-size: 16px;
+			/* padding: 12px; */
+			width: 28px;
+			height: 28px;
+			text-align: center;
+			border: 1px solid #fff;
+			color: #fff;
+		}
+
+		.hover:hover {
+			background-color: #fff;
+			color: #000;
+		}
+
+		input {
+			outline: none;
+		}
+	</style>
+
+	<script>
+		const viewer = document.querySelector('#viewer-con');
+		const ascii = document.querySelector('#ascii-text');
+
+		const fileInput = document.querySelector('#file-input');
+		const fileErr = document.querySelector('.file-err');
+
+		const openViewer = (fontSize = 10) => {
+			viewer.style.display = 'block';
+			ascii.style.fontSize = fontSize + 'px';
+		};
+
+		const closeViewer = () => {
+			viewer.style.display = 'none';
+		};
+
+		fileInput.addEventListener('change', async (e) => {
+			fileErr.style.display = 'none';
+
+			const file = e.target.files[0];
+
+			if (!file) {
+				fileErr.style.display = 'block';
+				fileErr.textContent = 'Failed to open file';
+				return;
+			}
+
+			const text = await file.text();
+
+			ascii.textContent = text;
+
+			const lines = text.split('\n');
+			const rows = lines.length;
+			const cols = lines[0].length;
+
+			const windowWidth = window.innerWidth;
+			const windowHeight = window.innerHeight;
+
+			const maxWidth = windowWidth / (cols * 0.6);
+			const maxHeight = windowHeight / (rows * 1.2);
+
+			const fontSize = Math.floor(Math.min(maxHeight, maxWidth));
+
+			openViewer(fontSize);
+		});
+
+		// const closeViewerButton = document.querySelector('#close-viewer');
+		// closeViewerButton.addEventListener('click', closeViewer);
+
+		const modeMap = {
+			'#ffffff': '#000000',
+			'#000000': '#ffffff',
+		};
+
+		document.addEventListener('keydown', (e) => {
+			if (e.key === 'Escape') {
+				closeViewer();
+			}
+
+			if (e.key === 'T' || e.key === 't') {
+				// MUST USE GET COMPUTE STYLE
+				// const curr = viewer.style.backgroundColor;
+				// console.log(curr);
+				// viewer.style.backgroundColor = modeMap[curr];
+				// ascii.style.color = curr;
+			}
+		});
+	</script>
+</html>
