@@ -32,7 +32,7 @@
 		<div id="viewer-con">
 			<div class="button-con">
 				<p>'Esc' to close</p>
-				<p>'T' to toggle dark/light mode</p>
+				<!-- <p>'T' to toggle dark/light mode</p> -->
 			</div>
 
 			<div id="ascii-con">
@@ -121,7 +121,7 @@
 
 			flex-direction: column;
 
-			background: #ffffff50;
+			/* background: #ffffff50; */
 			background: #000;
 		}
 
@@ -176,8 +176,12 @@
 			ascii.style.fontSize = fontSize + 'px';
 		};
 
+		// Frame ID for requestAnimationFrame
+		let playbackID;
+
 		const closeViewer = () => {
 			viewer.style.display = 'none';
+			clearInterval(playbackID);
 		};
 
 		fileInput.addEventListener('change', async (e) => {
@@ -192,10 +196,11 @@
 			}
 
 			const text = await file.text();
+			const frames = text.split('<FRAME>');
 
-			ascii.textContent = text;
+			ascii.textContent = frames[0];
 
-			const lines = text.split('\n');
+			const lines = frames[0].split('\n');
 			const rows = lines.length;
 			const cols = lines[0].length;
 
@@ -208,28 +213,44 @@
 			const fontSize = Math.floor(Math.min(maxHeight, maxWidth));
 
 			openViewer(fontSize);
+
+			// Add playback if input is a video
+			if (frames.length > 1) {
+				frames.pop(); // Remove final frame, since it is empty
+				playback(ascii, frames);
+			}
 		});
 
-		// const closeViewerButton = document.querySelector('#close-viewer');
-		// closeViewerButton.addEventListener('click', closeViewer);
+		const playback = (ascii, frames) => {
+			const fps = 24;
+			let index = 1; // start at 1 so that skips first frame, since it's already rendered
 
-		const modeMap = {
-			'#ffffff': '#000000',
-			'#000000': '#ffffff',
+			const playbackID = setInterval(() => {
+				ascii.textContent = frames[index];
+
+				if (index + 1 >= frames.length) {
+					clearInterval(playbackID);
+				}
+				index += 1;
+			}, 1000 / fps);
 		};
+
+		// let themeIdx = 0;
+		// const colorMap = ['#000000', '#ffffff'];
 
 		document.addEventListener('keydown', (e) => {
 			if (e.key === 'Escape') {
 				closeViewer();
 			}
 
-			if (e.key === 'T' || e.key === 't') {
-				// MUST USE GET COMPUTE STYLE
-				// const curr = viewer.style.backgroundColor;
-				// console.log(curr);
-				// viewer.style.backgroundColor = modeMap[curr];
-				// ascii.style.color = curr;
-			}
+			// if (e.key === 'T' || e.key === 't') {
+			// 	// MUST USE GET COMPUTE STYLE
+
+			// 	themeIdx = 1 - themeIdx;
+
+			// 	viewer.style.backgroundColor = colorMap[themeIdx];
+			// 	ascii.style.color = colorMap[1 - themeIdx];
+			// }
 		});
 	</script>
 </html>
